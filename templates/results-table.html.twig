@@ -1,0 +1,5 @@
+<ul>
+    {% for item in items %}
+        <li><strong> {{ item.result_number }} </strong> : {{ item.datafield_100a }} ({{ item.datafield_100d }}) -- OCoLC# {{ item.controlfield_001 }} </li>
+    {% endfor %}
+</ul>

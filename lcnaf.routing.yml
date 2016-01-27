@@ -1,0 +1,26 @@
+# define routes to test pages and search form
+
+# simple test page
+lcnaf.simple_search_example:
+  path: 'lcnaf/simple_search_example'
+  defaults:
+    _controller: '\Drupal\lcnaf\Controller\LcnafPageController::simple_search_example'
+  requirements:
+    _permission: 'access content'
+
+# expanded search example
+lcnaf.custom_query_example:
+  path: 'lcnaf/custom_query_example'
+  defaults:
+    _controller: '\Drupal\lcnaf\Controller\LcnafPageController::custom_query_example'
+  requirements:
+    _permission: 'access content'
+    
+# define route to Simple Request form
+lcnaf.form:
+  path: 'lcnaf/simple_request'
+  defaults:
+    _title: 'LCNAF simple search'
+    _form: '\Drupal\lcnaf\Form\SimpleRequestForm'
+  requirements:
+    _permission: 'access content'
