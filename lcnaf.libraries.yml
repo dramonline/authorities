@@ -1,0 +1,6 @@
+lcnaf-search-results:
+  version: 1.x
+  css:
+    # key below is based on smacss (base, layout, theme, etc.)
+    base:
+      css/lcnaf-search-results.css: {}

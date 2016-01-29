@@ -9,3 +9,7 @@ lcnaf.custom_query_example:
 lcnaf.form:
   title:       'LCNAF simple search'
   route_name:  lcnaf.form
+
+lcnaf.form_ajax:
+  title:       'LCNAF ajax search'
+  route_name:  lcnaf.form_ajax

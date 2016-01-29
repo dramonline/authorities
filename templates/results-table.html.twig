@@ -1,5 +1,29 @@
+{#
+/**
+ * @file
+ * theme implementation of LCNAF search results
+ *
+ * Available variables:
+ * - items: The LCNAF search result(s)
+ *   - result_number: result row number
+ *   - controlfield_001: OCoLC number
+ *   - datafield_100a: full name
+ *   - datafield_100d: birth/death year range
+ */
+#}
+
 <ul>
-    {% for item in items %}
-        <li><strong> {{ item.result_number }} </strong> : {{ item.datafield_100a }} ({{ item.datafield_100d }}) -- OCoLC# {{ item.controlfield_001 }} </li>
-    {% endfor %}
+  {% for item in items %}
+    <li>
+      {% spaceless %}
+        <strong>{{ item.result_number ~ ' : ' }}</strong>{{ item.datafield_100a ~ ' '}}
+        {% if item.datafield_100d %}
+          {{ item.datafield_100d ~ ', ' }}
+        {% endif %}
+        {{ 'OCoLC# ' ~ item.controlfield_001 }}
+      {% endspaceless %}
+    </li>
+  {% else %}
+    <li>No results to display for that name.</li>
+  {% endfor %}
 </ul>
