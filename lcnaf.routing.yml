@@ -24,3 +24,12 @@ lcnaf.form:
     _form: '\Drupal\lcnaf\Form\SimpleRequestForm'
   requirements:
     _permission: 'access content'
+    
+# define route to Ajax Request form
+lcnaf.form_ajax:
+  path: 'lcnaf/ajax_results'
+  defaults:
+    _title: 'LCNAF search'
+    _form: '\Drupal\lcnaf\Form\AjaxRequestForm'
+  requirements:
+    _permission: 'access content'
