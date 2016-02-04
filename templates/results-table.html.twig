@@ -21,6 +21,13 @@
           {{ item.datafield_100d ~ ', ' }}
         {% endif %}
         {{ 'OCoLC# ' ~ item.controlfield_001 }}
+        {{ ' ' }}
+        <a href="{{ path('lcnaf.form_ajax') }}" class="{{ 'link-add-authority' }}" data-lcnaf-lccn="{{ item.result_number }}">
+          {{ 'Add Authority Name'|t }}
+        </a>
+        {#
+        {{ link('Add Authority Name', url('lcnaf.form_ajax'), { 'class':['link-add-authority'], 'data-lcnaf-lccn': item.result_number } ) }}
+        #}
       {% endspaceless %}
     </li>
   {% else %}
