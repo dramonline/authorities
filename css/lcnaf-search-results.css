@@ -27,11 +27,20 @@
   margin-top: 35px;
 }
 
+.results-table-title,
 #lcnaf-search-results {
   clear: both;
-  padding-top: 25px;
+  padding-top: 45px;
 }
 
 #lcnaf-search-results li {
   line-height: 2.5em;
+}
+
+#lcnaf-ajax-request #edit-submit {
+  display: none;
+}
+
+#lcnaf-ajax-request td.lcnaf-result-lccn {
+  width: 0px;
 }

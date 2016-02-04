@@ -33,3 +33,11 @@ lcnaf.form_ajax:
     _form: '\Drupal\lcnaf\Form\AjaxRequestForm'
   requirements:
     _permission: 'access content'
+
+# define route to Autocomplete controller
+lcnaf.autocomplete:
+  path: '/lcnaf/autocomplete'
+  defaults:
+    _controller: '\Drupal\lcnaf\Controller\AutocompleteControllerLCNAF::autocomplete'
+  requirements:
+    _permission: 'administer content types'
