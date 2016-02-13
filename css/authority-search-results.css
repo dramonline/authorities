@@ -1,0 +1,70 @@
+#content h1 {
+  font-size: 1.3em;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 5px;
+  margin-bottom: 1em;
+}
+
+.authority-search-form {
+  margin-top: 30px;
+}
+
+.form-item-authority-source {
+  float: left;
+  margin-right: 20px;
+}
+
+.form-item-authority-source label {
+  margin-bottom: 0.25em;
+}
+
+.form-item-authority-source .form-select {
+  width: 130px;
+  height: 40px;
+  line-height: 40px;
+  background: #eee;
+}
+
+.form-item-full-name {
+  float: left;
+}
+
+.form-item-full-name label {
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.form-item-full-name .form-text {
+  height: 40px;
+  width: 690px;
+}
+
+#edit-do-search {
+  float: left;
+  height: 40px;
+  margin-left: 10px;
+  margin-top: 28px;
+}
+
+.ajax-progress-throbber {
+  margin-left: 10px;
+  margin-top: 35px;
+}
+
+.results-table-title,
+#authority-search-results {
+  clear: both;
+  padding-top: 30px;
+}
+
+#authority-search-results li {
+  line-height: 2.5em;
+}
+
+#authority-search-form #edit-submit {
+  display: none;
+}
+
+#authority-search-form td.authority-id {
+  width: 0px;
+}

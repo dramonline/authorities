@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\lcnaf\Controller\AutocompleteControllerLCNAF.
+ * Contains \Drupal\authority_search\Controller\AutocompleteController.
  */
 
-namespace Drupal\lcnaf\Controller;
+namespace Drupal\authority_search\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +14,7 @@ use Drupal\Component\Utility\Unicode;
 /**
  * Returns autocomplete responses for authority names.
  */
-class AutocompleteControllerLCNAF {
+class AutocompleteController {
 
   public function autocomplete(Request $request) {
     $matches = array();
