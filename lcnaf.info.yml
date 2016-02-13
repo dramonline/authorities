@@ -1,5 +1,0 @@
-name: 'LCNAF'
-type: module
-description: 'LCNAF authority browser'
-package: 'd8 Arch'
-core: '8.x'

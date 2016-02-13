@@ -1,0 +1,16 @@
+# define route to Authority Search form
+authority_search.authority_search_form:
+  path: '/authority_search/search'
+  defaults:
+    _title: 'Search Authorities'
+    _form: '\Drupal\authority_search\Form\AuthoritySearchForm'
+  requirements:
+    _permission: 'access content'
+
+# define route to Autocomplete controller
+authority_search.autocomplete:
+  path: '/authority_search/autocomplete'
+  defaults:
+    _controller: '\Drupal\authority_search\Controller\AutocompleteController::autocomplete'
+  requirements:
+    _permission: 'administer content types'

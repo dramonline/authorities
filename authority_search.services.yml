@@ -1,0 +1,4 @@
+services:
+  plugin.manager.authority_search:
+    class: Drupal\authority_search\AuthoritySearchManager
+    parent: default_plugin_manager
