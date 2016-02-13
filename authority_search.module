@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Lists available Authority Source plugins
+ *
+ * @return array
+ */
+function list_authority_source_plugins() {
+  
+  $plugins = array();
+  // get Authority Source plugin manager
+  $manager = \Drupal::service('plugin.manager.authority_search');
+  // get all available Authority Source plugins
+  $authority_source_plugins = $manager->getDefinitions();
+
+  // build list of Authority Source plugin names
+  foreach($authority_source_plugins as $key => $plugin) {
+    $plugins[$key] = $plugin['name']->render();
+  }
+
+  return $plugins;
+}
+   

@@ -1,0 +1,10 @@
+authority-search-results:
+  version: 1.x
+  css:
+    base:
+      css/authority-search-results.css: {}
+  
+  js:
+    js/authority-search-results.js: {}
+  dependencies:
+  - core/jquery
