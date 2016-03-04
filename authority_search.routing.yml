@@ -14,3 +14,12 @@ authority_search.autocomplete:
     _controller: '\Drupal\authority_search\Controller\AutocompleteController::autocomplete'
   requirements:
     _permission: 'administer content types'
+
+# define route to plugin configuration form
+authority_search.config:
+  path: '/admin/structure/authority_search/settings'
+  defaults:
+    _form: '\Drupal\authority_search\AuthoritySearchConfigForm'
+    _title: 'Authority Search - Configuration'
+  requirements:
+    _permission: 'administer site configuration'
