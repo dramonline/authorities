@@ -6,7 +6,6 @@
 namespace Drupal\authority_search\Form;
 
 use \GuzzleHttp\Client;
-use Drupal\node\Entity\Node;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -131,9 +130,11 @@ class AuthoritySearchForm extends FormBase {
     $authority_source_plugin_id = $form_state->getValue('authority_source');
     
     // get Authority Source plugin manager
-    $manager = \Drupal::service('plugin.manager.authority_search');
+    //$manager = \Drupal::service('plugin.manager.authority_search');
     // create instance of the selected Authority Source plugin
-    $authority_source = $manager->createInstance($authority_source_plugin_id);
+    //$authority_source = $manager->createInstance($authority_source_plugin_id);
+    $authority_source = get_authority_source_plugin_instance($authority_source_plugin_id);
+
     // build query and search Authority Source with it
     $query = $authority_source->buildQueryNameFirstLast($full_name);
     $items = $authority_source->search($query);
@@ -165,8 +166,9 @@ class AuthoritySearchForm extends FormBase {
     
     // get data for selected authority record;
     // get Authority Source plugin manager and create instance of the selected Authority Source plugin
-    $manager = \Drupal::service('plugin.manager.authority_search');
-    $authority_source = $manager->createInstance($authority_source_plugin_id);
+    //$manager = \Drupal::service('plugin.manager.authority_search');
+    //$authority_source = $manager->createInstance($authority_source_plugin_id);
+    $authority_source = get_authority_source_plugin_instance($authority_source_plugin_id);
     $authority_data = $authority_source->getAuthorityDataForm($form_state);
 
     // create a new entity for selected authority record
