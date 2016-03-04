@@ -1,5 +1,10 @@
 <?php
 
+// @todo
+// move these util functions into .inc file? only use .module for hooks?
+
+use Drupal\Core\Entity\EntityTypeBundleInfo;
+
 /**
  * Lists available Authority Source plugins
  *
@@ -20,4 +25,88 @@ function list_authority_source_plugins() {
 
   return $plugins;
 }
-   
+
+/**
+ * Get instance of selected Authority Source plugin
+ *
+ * @return Authority Source plugin instance
+ */
+function get_authority_source_plugin_instance($plugin_id) {
+
+  // get Authority Source plugin manager
+  $manager = \Drupal::service('plugin.manager.authority_search');
+  // create instance of the selected Authority Source plugin
+  $authority_source = $manager->createInstance($plugin_id);
+
+  return $authority_source;
+}
+
+
+
+
+
+
+
+
+
+//
+// also fn that lists all fields for a given entity bundle/subtype
+//
+
+
+
+
+function list_content_entity_types($include = array(), $exclude = array()) {
+
+  // provide default list of content entity types to include
+  if (empty($include)) {
+    $include = array(
+      'node',
+      'taxonomy_term',
+      'user',
+    );
+
+    if (!empty($exclude)) {
+      foreach($include as $key => $type) {
+        if (in_array($type, $exclude)) {
+          unset($include[$key]);
+        }
+      }
+    }
+  }
+  
+  // get all content entity types available
+  $entity_types = \Drupal::entityManager()->getDefinitions();
+
+  // only list content entity types that are included (and not excluded)
+  foreach($entity_types as $key => $entity_type) {
+    $group = $entity_type->getGroup();
+    
+    if ($group == 'content' && in_array($key, $include) && !in_array($key, $exclude)) {
+      if ($key == 'node') {
+        $entity_type_label = 'Node'; // display "Node" instead of "Content"
+      }
+      else {
+        $entity_type_label = $entity_type->getLabel()->render();
+      }
+      $content_entity_types[$key] = $entity_type_label;
+    }
+  }
+
+  return $content_entity_types;
+}
+
+
+function list_subtypes_for_entity_type($entity_type = 'node', $exclude = array()) {
+
+  // get all subtypes/bundles available for selected entity type
+  $subtypes = \Drupal::entityManager()->getBundleInfo($entity_type);
+
+  // only list subtypes that aren't excluded)
+  foreach($subtypes as $key => $subtype) {
+    $subtypes_output[$key] = $subtype['label'];
+  }
+
+  return $subtypes_output;
+}
+
