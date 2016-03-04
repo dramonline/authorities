@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\authority_search\Plugin\AuthoritySource\Lcnaf.
+ * Contains \Drupal\authority_search\Plugin\AuthoritySource\Viaf.
  */
 
 namespace Drupal\authority_search\Plugin\AuthoritySource;
@@ -11,17 +11,17 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\authority_search\AuthoritySourceBase;
 
 /**
- * Provides an LCNAF Authority Source plugin.
+ * Provides an VIAF Authority Source plugin.
  *
  * @AuthoritySource(
- *   id = "LCNAF",
- *   name = @Translation("LCNAF"),
- *   description = @Translation("LCNAF Authorities"),
+ *   id = "VIAF",
+ *   name = @Translation("VIAF"),
+ *   description = @Translation("VIAF Authorities"),
  *   search_text = "",
  *   search_options = {}
  * )
  */
-class Lcnaf extends AuthoritySourceBase {
+class Viaf extends AuthoritySourceBase {
 
   /**
    * {@inheritdoc}
@@ -29,7 +29,7 @@ class Lcnaf extends AuthoritySourceBase {
   public function getConfiguration() {
     // @todo
     // should use a container and configFactory instead?
-    return \Drupal::config('authority_search.lcnaf-config')->get();
+    return \Drupal::config('authority_search.viaf-config')->get();
   }
 
   /**
@@ -42,19 +42,19 @@ class Lcnaf extends AuthoritySourceBase {
   	$first_name = (!empty($name['first'])) ? $name['first'] : '';
   	$last_name  = (!empty($name['last'])) ? $name['last'] : '';
 
-    $query_string = 'local.FamilyName+%3D+%22' . $last_name . '%22+and+local.FirstName+%3D+%22' . $first_name . '%22';
+    $query_string = 'local.personalName all "' . $first_name . ' ' . $last_name . '"';
 
     return $query_string;
   }
 
- /**
+  /**
    * Return a query string to search the Authority Source with
    *
    * @return string
    */
-  public function buildQueryStringAuthorityId($lccn) {
+  public function buildQueryStringAuthorityId($authority_id) {
 
-    $query_string = 'local.LCCN+%3D+%22' . $lccn . '%22';
+    $query_string = 'local.lccn exact "' . $authority_id . '"';
 
     return $query_string;
   }
@@ -72,13 +72,14 @@ class Lcnaf extends AuthoritySourceBase {
     // get any additional search options
     $options = $this->getSearchOptions();
  
-    // build LCNAF query - search for First Name AND Family (Last) Name
+    // build VIAF query - search for First Name AND Family (Last) Name
     $query = array(
       'query'          => $query_string,
+      'httpAccept'     => 'application/xml',
       'maximumRecords' => 10, // results per page
       'startRecord'    => 1,  // result number to start with
     );
-    
+
     return $query;
   }
 
@@ -93,14 +94,11 @@ class Lcnaf extends AuthoritySourceBase {
     $client = new Client();
 
     // send GET request with search query
-    $response = $client->request('GET', 'http://alcme.oclc.org/srw/search/lcnaf', array(
+    $response = $client->request('GET', 'http://viaf.org/processed/search/processed', array(
       'query' => $query,
     ));
-
-    // @todo
-    // no need to include SimpleXML dependency, since it's included with PHP by default?
  
-    // convert XML response from LCNAF service
+    // convert XML response from VIAF service
     $xml_response = $response->getBody();
     $xml_data = new \SimpleXMLElement($xml_response);
 
@@ -119,21 +117,21 @@ class Lcnaf extends AuthoritySourceBase {
     
     $items = array();
     $result_count = 1;
-    
+
     if (isset($xml_data->records->record)) {
   	  // extract data from each XML record
   	  foreach($xml_data->records->record as $record) {
-    		// handle xml namespacing (example: "mx:record")
-    		$record_xml = $record->recordData->children('http://www.loc.gov/MARC21/slim');
-    			    
-    		// get datafield values
-    		$item = array();
-    		$item['result_number'] = $result_count;
+  		  // handle xml namespacing (example: "mx:record")
+  		  $record_xml = $record->recordData->children('http://www.loc.gov/MARC21/slim');
 
-    		// @todo
-    		// abstract this - plugin can just provide array of field labels, possibly correpsonding xpath
-    		// or json paths for getting field values for each? maybe stores human-readable name also.
-    		// could implement that as a yaml file and/or configuration entity.
+  		  // get datafield values
+  		  $item = array();
+  		  $item['result_number'] = $result_count;
+
+  		  // @todo
+  		  // abstract this - plugin can just provide array of field labels, possibly correpsonding xpath
+  		  // or json paths for getting field values for each? maybe stores human-readable name also.
+  		  // could implement that as a yaml file and/or configuration entity.
   		
   		  if (isset($record_xml->xpath('mx:controlfield[@tag="001"]')[0])) {
   	      $item['controlfield_001'] = $record_xml->xpath('mx:controlfield[@tag="001"]')[0]; // OCoLC number
@@ -154,7 +152,7 @@ class Lcnaf extends AuthoritySourceBase {
   	    }
 
   	    $items[] = $item;
-    		$result_count++;
+  		  $result_count++;
   	  }
   	}
     
