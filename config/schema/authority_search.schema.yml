@@ -1,0 +1,67 @@
+# LCNAF plugin config
+authority_search.lcnaf-config:
+  type: config_object
+  label: 'Authority Search - LCNAF Plugin Configuration'
+  mapping:
+    target_entity_type:
+      type: string
+      label: 'LCNAF - Target Entity Type'
+    target_entity_subtype:
+      type: string
+      label: 'LCNAF - Target Entity Bundle/Subtype'
+    setting_one:
+      type: string
+      label: 'LCNAF - Setting One'
+    setting_two:
+      type: mapping
+      label: 'LCNAF - Authority Data Fields'
+      mapping:
+        datafield_title:
+          type: text # 'text' type is translatable, 'string' is not
+          label: 'Datafield Title'
+        datafield_machine_name:
+          type: string
+          label: 'Datafield Machine Name'
+        datafield_type:
+          type: string
+          label: 'Datafield Type'
+        datafield_path:
+          type: string
+          label: 'Datafield Path'
+        datafield_target_field:
+          type: string
+          label: 'Target field'
+
+# VIAF plugin config
+authority_search.viaf-config:
+  type: config_object
+  label: 'Authority Search - VIAF Plugin Configuration'
+  mapping:
+    target_entity_type:
+      type: string
+      label: 'VIAF - Target Entity Type'
+    target_entity_subtype:
+      type: string
+      label: 'VIAF - Target Entity Bundle/Subtype'
+    setting_one:
+      type: string
+      label: 'VIAF - Setting One'
+    setting_two:
+      type: mapping
+      label: 'VIAF - Authority Data Fields'
+      mapping:
+        datafield_title:
+          type: text
+          label: 'Datafield Title'
+        datafield_machine_name:
+          type: string
+          label: 'Datafield Machine Name'
+        datafield_type:
+          type: string
+          label: 'Datafield Type'
+        datafield_path:
+          type: string
+          label: 'Datafield Path'
+        datafield_target_field:
+          type: string
+          label: 'Target field'

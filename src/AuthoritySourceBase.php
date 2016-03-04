@@ -7,13 +7,12 @@
 namespace Drupal\authority_search;
 
 use \GuzzleHttp\Client;
-//use Drupal\node\Entity\Node;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Plugin\PluginBase;
 
 class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface {
-  
+
   // get properties from annotation docblock 
   
   public function getName() {
@@ -43,7 +42,7 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
   /**
    * Return a query to search the Authority Source with
    *
-   * @return string
+   * @return array
    */
   public function buildQueryNameFirstLast($search_text = '', $search_options = array()) {
 
@@ -53,7 +52,7 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
   	}
   	
   	if (!empty($search_options)) {
-  	  $this->setSearchText($search_options);
+  	  $this->setSearchOptions($search_options);
   	}
 
   	// split full name into first_name / last_name - seems to be only way to search LCNAF by full name
@@ -68,7 +67,97 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
   }
 
   /**
-   * wraps getAuthorityData() - for use with authority search forms
+   * Return a query for searching the Authority Source by authority id (LCCN, etc.)
+   *
+   * @return array
+   */
+  public function buildQueryAuthorityId($authority_id) {
+    // cleanup LCCN value for query
+    $authority_id = $this->makeQueryReadyAuthorityId($authority_id);
+
+    // finish building the query, adding in any search options
+    $query_string = $this->buildQueryStringAuthorityId($authority_id);
+    $query = $this->configQuery($query_string);
+
+    return $query;
+  }
+
+  /**
+   * Return a query string for searching the Authority Source
+   *
+   * @return string
+   */
+  public function buildQueryStringNameFirstLast($name) {
+  	//
+  	// add code here
+  	//
+  	$query_sting = '';
+
+    // use $name['first'] and $name['last'] to create a query string
+    // specific to the plugin.
+    
+    return $query_string;
+  }
+
+  /**
+   * Get authority data for a particular record, specified by an authority id;
+   * this data can be used to populate fields on a new or existing entity.
+   *
+   * @return array
+   */
+  public function buildQueryStringAuthorityId($authority_id) {
+  	//
+  	// add code here
+  	//
+    $query_string = '';
+    
+    return $query_string;
+  }
+
+  /**
+   * Configure a generic query, using the query provided
+   *
+   * @return array
+   */
+  public function configQuery($query) {
+  	//
+  	// add code here
+  	//
+  	return $query;
+  }
+
+  /**
+   * Return search results from the Authority Source search
+   *
+   * @return array
+   */
+  public function search($query) {
+  	//
+  	// add code here
+  	//
+  	$items = array();
+
+    return $items;
+  }
+
+  /**
+   * Get authority data for a particular search result item - this data can be used to populate fields
+   * for a new or existing entity.
+   *
+   * @return array
+   */
+  public function getAuthorityData($authority_id) {
+
+    $authority_id = $authority_id;
+    $authority_data = $this->getAuthorityDataByAuthorityId($authority_id);
+
+    return $authority_data;
+  }
+
+  /**
+   * wrapper for getAuthorityData() - for use with authority search forms
+   *
+   * @return array
    */
   public function getAuthorityDataForm($form_state) {
     
@@ -83,6 +172,45 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
     $authority_data = $this->getAuthorityData($authority_id);
 
     return $authority_data;
+  }
+
+  /**
+   * Get authority data for a particular search result item - this data can be used to populate fields
+   * for a new or existing entity.
+   *
+   * @return array
+   */
+  public function getAuthorityDataByAuthorityId($authority_id) {
+        
+    $authority_data = array();
+    
+    // use LCCN to query VIAF for corresponding record, then extract data from it
+    if (!empty($authority_id)) {
+      $query = $this->buildQueryAuthorityId($authority_id);
+      $items = $this->search($query);
+      
+      if (!empty($items)) {
+        $item = reset($items);
+        $authority_data['authority_id'] = $authority_id;
+        $authority_data['name_full'] = (isset($item['datafield_100a'])) ? (string) $item['datafield_100a'] : ''; 
+      }
+    }
+    
+    return $authority_data;
+  }
+
+  /**
+   * Extract search results from Authority Source response data
+   *
+   * @return array
+   */
+  public function extractSearchResults($data) {
+  	//
+  	// add code here
+  	//
+  	$items = array();
+    
+    return $items;
   }
 
   /**
@@ -200,12 +328,27 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
     // authority_id and title are required to create node
     if (!empty($authority_id) && !empty($title)) {
       
+
+
+
+
+
       // @todo
       // add admin form for setting a default entity type and entity bundle for each available Authority Source plugin.
       // also, make sure that all entity types support a 'title' property, as well as other properties set below.
       
-      $entity_type   = 'node';
-      $entity_bundle = 'page';
+      $configuration = $this->getConfiguration();
+      //kint($this->getConfiguration());
+
+      $entity_type   = $configuration['target_entity_type'];
+      $entity_bundle = $configuration['target_entity_subtype'];
+      //$entity_type   = 'node';
+      //$entity_bundle = 'page';
+
+
+
+
+
       $entity_storage = \Drupal::entityManager()->getStorage($entity_type)->create(array(
         'type'     => $entity_bundle,
         'title'    => $title,
@@ -260,8 +403,57 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
     return $result;
   }
 
-  // shared util methods below - all plugins can use these (for splitting name string, etc.)
- 
+  /**
+   * Prepare authority id for query by removing whitespace and other extraneous characters
+   *
+   * @return string
+   */
+  public function makeQueryReadyAuthorityId($authority_id) {
+    // remove all spaces from LCCN
+    $authority_id = preg_replace("/\s+/", "", $authority_id);
+    
+    return $authority_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfiguration() {
+    //
+    // add code here
+    //
+    return $configuration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setConfiguration(array $configuration) {
+    //
+    // add code here
+    //
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration() {
+    //
+    // add code here
+    //
+    return $configuration;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function calculateDependencies() {
+    //
+    // add code here
+    //
+    return $dependencies;
+  }
+
   /*
    * split full name into first name / last name
    * (works with "Sol Lewitt" or "Lewitt, Sol")
@@ -285,77 +477,6 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
     }
     
     return $name;  
-  }
-
-  //
-  // methods below do not have default implementations
-  //
-
-  /**
-   * Return a query string for searching the Authority Source
-   *
-   * @return string
-   */
-  public function buildQueryStringNameFirstLast($name) {
-
-  	$query_sting = '';
-
-    // use $name['first'] and $name['last'] to create a query string
-    // specific to the plugin.
-    
-    return $query_string;
-  }
-
-  /**
-   * Configure a generic query, using the query string provided
-   *
-   * @return string
-   */
-  public function configQuery($query) {
-  	
-  	// add code here
-  	
-  	return $query;
-  }
-
-  /**
-   * Return search results from the Authority Source search
-   *
-   * @return array
-   */
-  public function search($query) {
-
-  	// add code here
-  	$items = array();
-
-    return $items;
-  }
-
-  /**
-   * Extract search results from Authority Source response data
-   *
-   * @return array
-   */
-  public function extractSearchResults($data) {
-
-  	// add code here
-  	$items = array();
-    
-    return $items;
-  }
-
-  /**
-   * Get authority data for a particular search result item - this data can be used to populate fields
-   * on a new or existing entity.
-   *
-   * @return array
-   */
-  public function getAuthorityData($authority_id) {
-
-  	// add code here
-  	$authority_data = array();
-
-    return $authority_data;
   }
 
 }
