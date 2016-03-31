@@ -16,6 +16,8 @@ use Drupal\authority_search\AuthoritySourceBase;
  * @AuthoritySource(
  *   id = "LCNAF",
  *   name = @Translation("LCNAF"),
+ *   source_abbrev = "LCNAF",
+ *   record_data_type = "XML",
  *   description = @Translation("LCNAF Authorities"),
  *   search_text = "",
  *   search_options = {}
@@ -153,12 +155,50 @@ class Lcnaf extends AuthoritySourceBase {
   	      $item['datafield_100d'] = $record_xml->xpath('mx:datafield[@tag="100"]/mx:subfield[@code="d"]')[0];
   	    }
 
+        $item['source']    = $this->getSourceAbbrev();
+        $item['data_type'] = $this->getRecordDataType();
+        $item['uri']       = $this->buildAuthorityUri($record_xml);
+
+        // @todo
+        // get 'rules' from $record_xml -- parse datafield 008
+        $item['rules'] = 'RDA';
+        
+        // @todo
+        // store XML record as-is or as serialized XML? can use drupal serialize fn for XML and JSON.
+        // store entire data structure (as XML, JSON, etc.)
+        $item['data'] = $xml_data->records->record->asXML();
+
   	    $items[] = $item;
     		$result_count++;
   	  }
   	}
     
     return $items;
+  }
+
+  /**
+   * Utility fn - returns a URI corresponding to the authority record.
+   *
+   * @return string
+   */
+  public function buildAuthorityUri($record_xml) {
+    // uri suffix defines format of record - can be ".html", ".marcxml.xml", etc. sample URIs:
+    // http://id.loc.gov/authorities/names/n83026797.html
+    // http://id.loc.gov/authorities/names/n83026797.marcxml.xml
+    $uri_suffix = ".html";
+    $uri = '';
+
+    if (isset($record_xml->xpath('mx:datafield[@tag="010"]/mx:subfield[@code="a"]')[0])) {
+      $datafield_010a = $record_xml->xpath('mx:datafield[@tag="010"]/mx:subfield[@code="a"]')[0]; // this is the LCCN
+      // remove spaces from LCCN values (for example, "n 97072415" - should be "n97072415")
+      $id_for_uri = $this->makeQueryReadyAuthorityId($datafield_010a);
+    }
+
+    if (!empty($id_for_uri)) {
+      $uri = 'http://id.loc.gov/authorities/names/' . $id_for_uri . $uri_suffix;
+    }
+
+    return $uri;
   }
 
 }

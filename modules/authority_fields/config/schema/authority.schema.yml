@@ -1,0 +1,76 @@
+field.field_authority.name:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        name:
+          type: string
+          label: 'Authority Name'
+
+field.field_authority.source_id:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        source_id:
+          type: string
+          label: 'Authority Source ID'
+
+field.field_authority.source:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        source:
+          type: string
+          label: 'Authority Source'
+          
+field.field_authority.rules:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        rules:
+          type: string
+          label: 'Authority Rules'
+          
+field.field_authority.uri:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        uri:
+          type: uri
+          label: 'Authority URI'
+          
+field.field_authority.data:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        data:
+          type: string
+          label: 'Authority Data (raw)'
+          
+field.field_authority.data_type:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    - type: mapping
+      label: 'Default'
+      mapping:
+        data_type:
+          type: string
+          label: 'Authority Data Type'

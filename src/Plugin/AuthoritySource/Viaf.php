@@ -17,6 +17,8 @@ use Drupal\authority_search\AuthoritySourceBase;
  *   id = "VIAF",
  *   name = @Translation("VIAF"),
  *   description = @Translation("VIAF Authorities"),
+ *   source_abbrev = "VIAF",
+ *   record_data_type = "XML",
  *   search_text = "",
  *   search_options = {}
  * )
@@ -151,12 +153,68 @@ class Viaf extends AuthoritySourceBase {
   	      $item['datafield_100d'] = $record_xml->xpath('mx:datafield[@tag="100"]/mx:subfield[@code="d"]')[0];
   	    }
 
+        $item['source']    = $this->getSourceAbbrev();
+        $item['data_type'] = $this->getRecordDataType();
+        $item['uri']       = $this->buildAuthorityUri($record_xml);
+
+        // @todo
+        // get 'rules' from $record_xml -- parse datafield 008
+        $item['rules'] = 'RDA';
+        
+        // @todo
+        // store XML record as-is or as serialized XML? can use drupal serialize fn for XML and JSON.
+        // store entire data structure (as XML, JSON, etc.)
+        $item['data'] = $xml_data->records->record->asXML();
+
   	    $items[] = $item;
   		  $result_count++;
   	  }
   	}
     
     return $items;
+  }
+
+  /**
+   * Utility fn - returns a URI corresponding to the authority record.
+   *
+   * @return string
+   */
+  public function buildAuthorityUri($record_xml) {
+    $uri = '';
+
+    if (isset($record_xml->xpath('mx:datafield[@tag="010"]/mx:subfield[@code="a"]')[0])) {
+      $datafield_010a = $record_xml->xpath('mx:datafield[@tag="010"]/mx:subfield[@code="a"]')[0]; // this is the LCCN
+      // remove spaces from LCCN values (for example, "n 97072415" - should be "n97072415")
+      $lccn = $this->makeQueryReadyAuthorityId($datafield_010a);
+    }
+
+    if (!empty($lccn)) {
+      $uri = $this->translateLccnIdToViafUri($lccn);
+    }
+
+    return $uri;
+  }
+
+  /**
+   * Utility fn - translate a LCCN id to a VIAF id.
+   *
+   * @return string
+   */
+  public function translateLccnIdToViafUri($lccn) {
+    // use GET operation to retrieve VIAF uri for a given LC record id
+
+    // initialize http client
+    $client = new Client();
+
+    // send GET request for LCCN converted to VIAF;
+    // need to disable redirects, since VIAF uri is included as part of the 301 redirect header.
+    $response = $client->request('GET', 'http://www.viaf.org/viaf/lccn/' . $lccn, array(
+      'allow_redirects' => FALSE
+    ));
+
+    $viaf_id = $response->getHeaderLine('location');
+
+    return $viaf_id;
   }
 
 }
