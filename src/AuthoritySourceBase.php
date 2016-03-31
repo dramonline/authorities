@@ -23,6 +23,14 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
     return $this->pluginDefinition['description'];
   }
 
+  public function getSourceAbbrev() {
+    return $this->pluginDefinition['source_abbrev'];
+  }
+
+  public function getRecordDataType() {
+    return $this->pluginDefinition['record_data_type'];
+  }
+
   public function getSearchText() {
     return $this->pluginDefinition['search_text'];
   }
@@ -192,7 +200,12 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
       if (!empty($items)) {
         $item = reset($items);
         $authority_data['authority_id'] = $authority_id;
-        $authority_data['name_full'] = (isset($item['datafield_100a'])) ? (string) $item['datafield_100a'] : ''; 
+        $authority_data['name_full'] = (isset($item['datafield_100a'])) ? (string) $item['datafield_100a'] : '';
+        $authority_data['source']    = (isset($item['source'])) ? (string) $item['source'] : '';
+        $authority_data['rules']     = (isset($item['rules'])) ? (string) $item['rules'] : '';
+        $authority_data['uri']       = (isset($item['uri'])) ? (string) $item['uri'] : '';
+        $authority_data['data']      = (isset($item['data'])) ? (string) $item['data'] : '';
+        $authority_data['data_type'] = (isset($item['data_type'])) ? (string) $item['data_type'] : '';
       }
     }
     
@@ -318,7 +331,7 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
    * @return bool
    */
   public function createAuthorityEntity($authority_data) {
-     
+    
     $result = FALSE;
 
     // get authority name data
@@ -328,37 +341,40 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
     // authority_id and title are required to create node
     if (!empty($authority_id) && !empty($title)) {
       
-
-
-
-
-
       // @todo
-      // add admin form for setting a default entity type and entity bundle for each available Authority Source plugin.
-      // also, make sure that all entity types support a 'title' property, as well as other properties set below.
+      // make sure that all entity types support a 'title' property, as well as other properties set below.
       
       $configuration = $this->getConfiguration();
       //kint($this->getConfiguration());
 
       $entity_type   = $configuration['target_entity_type'];
       $entity_bundle = $configuration['target_entity_subtype'];
-      //$entity_type   = 'node';
-      //$entity_bundle = 'page';
+      $authority_field_name = $this->getAuthorityFieldName($entity_type, $entity_bundle);
 
-
-
-
-
-      $entity_storage = \Drupal::entityManager()->getStorage($entity_type)->create(array(
+      $entity_data = array(
         'type'     => $entity_bundle,
         'title'    => $title,
         'langcode' => 'en',
         'uid'      => '1',
         'status'   => 1,
         'body'     => array(t("The Authority ID for this $entity_type is ") . $authority_id),
-        // custom fields use this format:
-        //'field_fields' => array(),
-      ));
+      );
+
+      // can use $entity->hasField('field_article_some_text') to check if a field exists.
+
+      if (!empty($authority_field_name)) {
+        $entity_data[$authority_field_name] = array(
+          'name'      => $title,
+          'source_id' => $authority_id,
+          'source'    => $authority_data['source'],
+          'rules'     => $authority_data['rules'],
+          'uri'       => $authority_data['uri'],
+          'data'      => $authority_data['data'],
+          'data_type' => $authority_data['data_type'],
+        );
+      }
+
+      $entity_storage = \Drupal::entityManager()->getStorage($entity_type)->create($entity_data);
       $entity_storage->save();
 
       drupal_set_message("Created a new Authority Name node for " . $authority_data['name_full']);
@@ -384,20 +400,23 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
 
   	$result = FALSE;
 
- 	/*
- 	// get $entity_id and $entity_type from fn parameters (along with authority data).
- 	// don't need to supply entity bundle here? just entity type.
- 	$storage = \Drupal::entityManager()->getStorage($entity_type);
- 	$entity = $storage->load($entity_id);
- 	//
- 	// modify title and store authority data in fields prior to saving this entity
- 	//
-	$entity->save();
- 	*/
- 	
+    // @todo
+    // how to update an existing field when its cardinality is > 1? seems like we just append to it?
+    
     // @todo
     // return status based on if entity was properly updated
     
+   	/*
+   	// get $entity_id and $entity_type from fn parameters (along with authority data).
+   	// don't need to supply entity bundle here? just entity type.
+   	$storage = \Drupal::entityManager()->getStorage($entity_type);
+   	$entity = $storage->load($entity_id);
+   	//
+   	// modify title and store authority data in fields prior to saving this entity
+   	//
+  	$entity->save();
+   	*/
+ 	 
     $result = TRUE;
 
     return $result;
@@ -477,6 +496,31 @@ class AuthoritySourceBase extends PluginBase implements AuthoritySourceInterface
     }
     
     return $name;  
+  }
+
+  /*
+   * get all field definitions for the given $entity_type and $entity_bundle
+   */
+  public function getAuthorityFieldName($entity_type, $entity_bundle) {
+
+    $authority_field_type = 'field_authority';
+    $authority_field_name = '';
+
+    $entityManager = \Drupal::service('entity.manager');
+    $fields = $entityManager->getFieldDefinitions($entity_type, $entity_bundle);
+
+    // look for one or more instances of the Authority field type
+    foreach($fields as $field) {
+      $field_type = $field->getType();
+
+      if ($field_type == $authority_field_type) {
+        $authority_field_name = $field->getName();
+        // use first instance found of the Authority field type
+        break;
+      }
+    }
+
+    return $authority_field_name;
   }
 
 }

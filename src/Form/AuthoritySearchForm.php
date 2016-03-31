@@ -170,6 +170,7 @@ class AuthoritySearchForm extends FormBase {
     //$authority_source = $manager->createInstance($authority_source_plugin_id);
     $authority_source = get_authority_source_plugin_instance($authority_source_plugin_id);
     $authority_data = $authority_source->getAuthorityDataForm($form_state);
+    //kint($authority_data);
 
     // create a new entity for selected authority record
     $authority_source->createAuthorityEntity($authority_data);
