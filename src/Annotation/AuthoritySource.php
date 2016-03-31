@@ -46,6 +46,20 @@ class AuthoritySource extends Plugin {
   public $description;
 
   /**
+   * The standard authority source code/abbreviation.
+   *
+   * @var string
+   */
+  public $source_abbrev;
+
+  /**
+   * The format that this authority source uses to store records (XML, JSON, etcetera).
+   *
+   * @var string
+   */
+  public $record_data_type;
+
+  /**
    * The text to search the Authority Source for.
    *
    * @var string

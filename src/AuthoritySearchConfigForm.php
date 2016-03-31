@@ -79,7 +79,7 @@ class AuthoritySearchConfigForm extends ConfigFormBase {
 
     $form['authsearch_viaf_target_entity_subtype'] = array(
       '#type' => 'select',
-      '#title' => $this->t('LCNAF - Target Entity Bundle/Subtype'),
+      '#title' => $this->t('VIAF - Target Entity Bundle/Subtype'),
       '#options' => list_subtypes_for_entity_type(),
       '#default_value' => $config_viaf->get('target_entity_subtype'),
     );
