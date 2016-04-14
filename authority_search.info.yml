@@ -1,5 +1,6 @@
 name: 'Authority Search'
 type: module
 description: 'Provides a plugin-based framework for searching remote authority sources. Includes an LCNAF authorities plugin.'
+configure: authority_search.config
 package: 'sophia'
 core: '8.x'

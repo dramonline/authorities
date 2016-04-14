@@ -7,6 +7,7 @@
 
 namespace Drupal\authority_fields\Plugin\Field\FieldType;
 
+use Drupal\Component\Utility\Random;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -112,6 +113,69 @@ class Authority extends FieldItemBase {
       ->setLabel(t('Authority Data Type'));
     
     return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  /*
+  public static function mainPropertyName() {
+    return 'name';
+  }
+  */
+ 
+  /**
+   * generate random field values - for use with tests and devel_generate
+   * 
+   * {@inheritdoc}
+   */
+  public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
+
+    $random = new Random();
+    $source_id_unique = TRUE;
+
+    $values['name'] = self::generateRandomAuthorityName($field_definition);
+    $values['source_id'] = $random->string(mt_rand(8, 12), $source_id_unique);
+    $values['source'] = strtoupper($random->word(mt_rand(2, 4)));
+    $values['rules'] = strtoupper($random->word(mt_rand(3, 8)));
+    $values['uri'] = self::generateRandomAuthorityUri($field_definition);
+    $values['data'] = $random->string(mt_rand(40, 1500));
+    $values['data_type'] = strtoupper($random->word(mt_rand(3, 4)));
+
+    return $values;
+  }
+
+  /*
+   * generate random authority name - used by generateSampleValue()
+   */
+  public function generateRandomAuthorityName(FieldDefinitionInterface $field_definition) {
+    $random = new Random();
+
+    $name_first = ucfirst($random->word(mt_rand(1, 20)));
+    $name_last = ucfirst($random->word(mt_rand(1, 20)));
+    $name_middle = ucfirst($random->word(mt_rand(0, 15)));
+
+    // add period if using middle initial
+    if (strlen($name_middle) == 1) {
+      $name_middle .= '.';
+    }
+
+    $name = $name_middle . ', ' . $name_first;
+    $name .= (!empty($name_middle)) ? ' ' . $name_middle : '';
+
+    return $name;
+  }
+
+  /*
+   * generate random authority uri - used by generateSampleValue()
+   */
+  public function generateRandomAuthorityUri(FieldDefinitionInterface $field_definition) {
+    $random = new Random();
+
+    // adapted from core/lib/Drupal/Core/Field/Plugin/Field/FieldType/UriItem.php
+    $uri = 'http://' . $random->word(mt_rand(2, 60));
+
+    return $uri;
   }
 
 }
