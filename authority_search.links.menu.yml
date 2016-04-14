@@ -1,0 +1,5 @@
+authority_search.config:
+  title: 'Authority Search'
+  parent: system.admin_config
+  description: 'Settings for Authority Search'
+  route_name: authority_search.config

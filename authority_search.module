@@ -3,7 +3,20 @@
 // @todo
 // move these util functions into .inc file? only use .module for hooks?
 
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfo;
+
+/**
+ * Implements hook_help().
+ */
+function authority_search_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.authority_search':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('You can set the default entity type and entity bundle separately for each authority source plugin on the <a href=":config">Configuration</a> page.', array(':config' => \Drupal::url('authority_search.config'))) . '</p>';
+      return $output;
+  }
+}
 
 /**
  * Lists available Authority Source plugins
