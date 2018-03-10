@@ -1,5 +1,5 @@
 name: Authority Fields
 type: module
 description: Provides custom fields for storing authority data from LCNAF, LCSH, VIAF and others.
-package: 'sophia'
+package: 'Authorities'
 core: '8.x'
